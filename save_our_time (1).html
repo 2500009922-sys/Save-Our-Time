@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAVE OUR TIME - Yến Nhi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf7f5;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f5f0eb; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2d9d0; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .tab-btn.active {
+            background-color: #bae6fd;
+            color: #0369a1;
+            box-shadow: 0 2px 8px rgba(186, 230, 253, 0.5);
+        }
+        .tab-btn.active-rose {
+            background-color: #fecdd3;
+            color: #be123c;
+            box-shadow: 0 2px 8px rgba(254, 205, 211, 0.5);
+        }
+
+        /* 3D Card Flip Animation for Daily Energy */
+        .card-perspective {
+            perspective: 1000px;
+        }
+        .card-inner {
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 3s infinite ease-in-out;
+        }
+
+        /* PiP Mode Styles */
+        body.pip-mode {
+            background-color: transparent !important;
+        }
+        
+        .pip-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .pip-header {
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            -webkit-app-region: drag;
+            flex-shrink: 0;
+        }
+
+        .pip-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #334155;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 10px;
+        }
+
+        .pip-content-area {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            background-color: #fdfdfd;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #475569;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col overflow-hidden text-slate-700 bg-amber-50/30">
+    <header class="bg-white/90 backdrop-blur border-b border-rose-100/80 px-4 sm:px-6 py-2.5 flex flex-wrap justify-between items-center shadow-xs z-20 shrink-0 gap-3">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-sky-200 via-indigo-200 to-pink-200 text-indigo-700 flex items-center justify-center text-base sm:text-lg shadow-xs">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-sm sm:text-base text-slate-800 leading-tight flex items-center gap-2">
+                    <span>SAVE OUR TIME</span>
+                </h1>
+                <p class="text-[10px] sm:text-[11px] text-slate-400 font-medium flex items-center gap-1">
+                    <span>Phát triển bởi Dương Ngọc Yến Nhi</span>
+                    <span class="text-rose-500 font-semibold">• Sinh viên Điều dưỡng</span>
+                    <span class="text-rose-400">🩺</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button id="btn-open-daily-energy" class="bg-gradient-to-r from-amber-100 via-rose-100 to-purple-100 hover:from-amber-200 hover:to-purple-200 text-amber-900 px-3 py-1.5 rounded-xl border border-amber-200/60 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs animate-pulse-subtle">
+                <i class="fa-solid fa-sparkles text-amber-500"></i>
+                <span class="hidden sm:inline">Năng Lượng Đầu Ngày</span>
+                <span class="sm:hidden">Rút Thẻ</span>
+            </button>
+
+            <div class="flex items-center bg-rose-50/60 p-1 rounded-xl border border-rose-100/60 text-xs font-medium">
+                <button id="tab-btn-app" class="tab-btn active px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-note-sticky"></i>
+                    <span class="hidden sm:inline">Ghi Chú & Nhắc Nhở</span>
+                </button>
+                <button id="tab-btn-about" class="tab-btn text-slate-600 hover:text-rose-600 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-nurse"></i>
+                    <span class="hidden sm:inline">Giới Thiệu Tác Giả</span>
+                </button>
+            </div>
+
+            <button id="btn-open-settings" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors border border-slate-200/80 shadow-2xs" title="Cài đặt Âm thanh & Nhắc nhở sinh tồn">
+                <i class="fa-solid fa-gear text-sm"></i>
+            </button>
+            <button id="btn-open-guide" class="w-9 h-9 rounded-xl bg-amber-100/80 hover:bg-amber-200/80 text-amber-800 flex items-center justify-center transition-colors border border-amber-200/80 shadow-2xs" title="Hướng dẫn & Mẹo sử dụng thông minh">
+                <i class="fa-solid fa-lightbulb text-sm text-amber-600"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-hidden relative">
+
+        <!-- ================= TAB 1: GHI CHÚ & NHẮC NHỜ ================= -->
+        <div id="tab-content-app" class="w-full h-full flex flex-col md:flex-row overflow-hidden">
+            
+            <aside class="w-full md:w-72 lg:w-80 bg-white/90 border-r border-rose-100/60 flex flex-col h-1/2 md:h-full shadow-xs z-10 shrink-0">
+                <div class="p-4 border-b border-rose-50 bg-rose-50/30 text-center">
+                    <div class="flex items-center justify-center mb-2">
+                        <h2 class="font-semibold text-[11px] uppercase tracking-wider text-sky-700 flex items-center gap-2">
+                            <i class="fa-solid fa-clock text-sky-400"></i> Giờ Hiện Tại
+                        </h2>
+                    </div>
+                    <div id="current-time" class="text-2xl sm:text-3xl font-extrabold text-sky-800 font-mono py-2 px-2 bg-sky-50/70 rounded-2xl border border-sky-100 shadow-2xs tracking-wider">
+                        00:00:00
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+
+                    <div class="bg-amber-50/40 p-3 rounded-2xl border border-amber-100 shadow-2xs">
+                        <h2 class="font-semibold text-slate-700 mb-3 flex items-center justify-between text-xs">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-hourglass-half text-amber-500"></i> Đếm ngược thời gian</span>
+                            <span id="vital-alert-status-badge" class="text-[9px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-heart-pulse text-emerald-500"></i> Sinh tồn: Bật
+                            </span>
+                        </h2>
+                        
+                        <div id="timer-display" class="text-2xl font-bold text-center text-amber-900 mb-3 font-mono py-1.5 bg-amber-100/50 rounded-xl border border-amber-200 hidden">
+                            00:00
+                        </div>
+
+                        <div id="timer-inputs" class="flex gap-2 mb-3">
+                            <div class="flex-1">
+                                <label class="text-[11px] text-slate-500 mb-1 block">Phút</label>
+                                <input type="number" id="timer-min" min="0" max="999" value="25" class="w-full p-2 text-sm border border-amber-200/80 rounded-xl focus:ring-2 focus:ring-sky-300 outline-none text-center font-mono bg-white">
+                            </div>
+                            <div class="flex-1">
+                                <label class="text-[11px] text-slate-500 mb-1 block">Giây</label>
+                                <input type="number" id="timer-sec" min="0" max="59" value="0" class="w-full p-2 text-sm border border-amber-200/80 rounded-xl focus:ring-2 focus:ring-sky-300 outline-none text-center font-mono bg-white">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button id="btn-start-timer" class="flex-1 bg-sky-200 hover:bg-sky-300 text-sky-800 py-2 rounded-xl transition-colors font-medium text-xs flex justify-center items-center gap-2 shadow-2xs">
+                                <i class="fa-solid fa-play"></i> Bắt đầu
+                            </button>
+                            <button id="btn-stop-timer" class="hidden flex-1 bg-rose-200 hover:bg-rose-300 text-rose-800 py-2 rounded-xl transition-colors font-medium text-xs flex justify-center items-center gap-2 shadow-2xs">
+                                <i class="fa-solid fa-stop"></i> Dừng
+                            </button>
+                            <button id="btn-reset-timer" class="w-9 bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 rounded-xl transition-colors flex justify-center items-center">
+                                <i class="fa-solid fa-rotate-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-rose-50/40 p-3 rounded-2xl border border-rose-100 shadow-2xs">
+                        <h2 class="font-semibold text-slate-700 mb-3 flex items-center justify-between text-xs">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-bell text-rose-400"></i> Đặt Lịch Nhắc Nhở</span>
+                        </h2>
+
+                        <div class="mb-3 space-y-2">
+                            <input type="text" id="reminder-text" placeholder="Nội dung nhắc (VD: Đi làm, Bổ sung nước...)" class="w-full p-2 border border-rose-200/70 rounded-xl focus:ring-2 focus:ring-sky-300 outline-none text-xs bg-white">
+                            <input type="time" id="reminder-time" class="w-full p-2 border border-rose-200/70 rounded-xl focus:ring-2 focus:ring-sky-300 outline-none text-center font-mono text-xs cursor-pointer bg-white">
+                        </div>
+                        
+                        <button id="btn-set-reminder" class="w-full bg-rose-200 hover:bg-rose-300 text-rose-800 py-2 rounded-xl transition-colors font-medium text-xs mb-3 shadow-2xs">
+                            Tạo nhắc nhở
+                        </button>
+
+                        <div id="active-reminders-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                            <!-- Reminders List -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="flex-1 flex flex-col h-1/2 md:h-full bg-rose-50/20 relative overflow-hidden">
+                <div class="bg-white/80 px-6 py-3 border-b border-rose-100/60 flex justify-between items-center shadow-2xs shrink-0">
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-book-bookmark text-sky-400"></i> Sổ Tay Ghi Chú
+                    </h2>
+                    <button id="btn-new-note" class="bg-sky-200 hover:bg-sky-300 text-sky-800 px-3.5 py-1.5 rounded-xl transition-colors font-medium text-xs flex items-center gap-2 shadow-2xs">
+                        <i class="fa-solid fa-plus"></i> Tạo ghi chú mới
+                    </button>
+                </div>
+
+                <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+                    <div class="w-full md:w-64 border-r border-rose-100/60 bg-white/50 flex flex-col shrink-0">
+                        <div class="p-2 border-b border-rose-100/40 bg-white/70">
+                            <div class="relative">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="search-note" placeholder="Tìm kiếm ghi chú..." class="w-full pl-8 pr-3 py-1.5 bg-rose-50/40 border border-rose-100 rounded-xl focus:ring-2 focus:ring-sky-200 outline-none text-xs">
+                            </div>
+                        </div>
+                        <div id="notes-list" class="flex-1 overflow-y-auto p-2 custom-scrollbar">
+                            <div class="text-center text-slate-400 text-xs py-10" id="empty-state">
+                                Chưa có ghi chú nào.<br>Bấm "Tạo ghi chú mới" để bắt đầu!
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="no-note-selected" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
+                        <div class="w-16 h-16 rounded-full bg-rose-100/60 text-rose-400 flex items-center justify-center text-2xl mb-3">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </div>
+                        <p class="text-sm font-medium text-slate-600">Chọn một ghi chú từ danh sách bên trái</p>
+                        <p class="text-xs text-slate-400 mt-1">Hoặc tạo ghi chú mới để bắt đầu viết nội dung.</p>
+                    </div>
+
+                    <div id="note-editor-container" class="flex-1 bg-white flex flex-col hidden relative overflow-hidden">
+                        <div class="p-2.5 border-b border-rose-100/40 flex justify-between items-center bg-rose-50/20">
+                            <div class="flex-1 mr-3 flex items-center gap-2">
+                                <input type="text" id="note-title-input" placeholder="Tiêu đề ghi chú..." class="text-base font-bold bg-transparent outline-none flex-1 placeholder-slate-300 text-slate-800">
+                                <span id="note-last-edited" class="text-[10px] text-slate-400 font-medium shrink-0"></span>
+                            </div>
+                            <div class="flex gap-1.5">
+                                <button id="btn-pin-note" class="p-2 text-amber-700 bg-amber-100/60 hover:bg-amber-100 rounded-xl transition-colors text-xs" title="Ghim ra cửa sổ nổi Desktop (Picture-in-Picture)">
+                                    <i class="fa-solid fa-up-right-from-square"></i> Ghim Nổi
+                                </button>
+                                <button id="btn-delete-note" class="p-2 text-rose-600 bg-rose-100/60 hover:bg-rose-100 rounded-xl transition-colors text-xs" title="Xóa ghi chú này">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                <button id="btn-save-note" class="bg-sky-200 text-sky-800 hover:bg-sky-300 px-3 py-1.5 rounded-xl transition-colors font-medium text-xs flex items-center gap-1.5">
+                                    <i class="fa-solid fa-check"></i> Lưu
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50/60 px-3 py-1.5 flex flex-wrap gap-1.5 border-b border-purple-100 items-center shrink-0">
+                            <span class="text-[11px] font-bold text-purple-700 flex items-center mr-1">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-1 text-purple-400"></i> AI Trợ lý:
+                            </span>
+                            <button id="btn-ai-improve" class="ai-btn text-[11px] bg-white/90 border border-purple-200/80 hover:bg-purple-100/50 text-purple-800 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-2xs font-medium">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Làm mượt
+                            </button>
+                            <button id="btn-ai-summarize" class="ai-btn text-[11px] bg-white/90 border border-purple-200/80 hover:bg-purple-100/50 text-purple-800 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-2xs font-medium">
+                                <i class="fa-solid fa-compress"></i> Tóm tắt
+                            </button>
+                            <button id="btn-ai-todos" class="ai-btn text-[11px] bg-white/90 border border-purple-200/80 hover:bg-purple-100/50 text-purple-800 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 shadow-2xs font-medium">
+                                <i class="fa-solid fa-list-check"></i> Tạo To-do
+                            </button>
+                        </div>
+
+                        <!-- Banner gợi ý mẹo sử dụng nhanh -->
+                        <div class="bg-amber-50/80 px-3 py-1.5 border-b border-amber-100 flex items-center justify-between text-[11px] text-amber-900 shrink-0">
+                            <span class="flex items-center gap-1.5 font-medium truncate">
+                                <i class="fa-solid fa-lightbulb text-amber-500 shrink-0"></i>
+                                <span class="truncate"><strong>Mẹo:</strong> Thêm dấu "<strong>-</strong>" trước việc cần làm và kèm mốc giờ (VD: <em>- 10h30 Đi họp</em>) để tự động trích xuất nhắc nhở rõ ràng nhất!</span>
+                            </span>
+                            <button id="btn-open-guide-link" class="text-amber-700 hover:text-amber-900 underline font-semibold text-[10px] ml-2 shrink-0">
+                                Chi tiết
+                            </button>
+                        </div>
+
+                        <textarea id="note-content-input" placeholder="Viết nội dung ở đây... (Gợi ý: Dùng - 10h30 Đi học hoặc - 18:00 Uống nước để tạo nhắc nhở tự động!)" class="flex-1 p-4 resize-none outline-none text-slate-700 leading-relaxed custom-scrollbar text-xs"></textarea>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- ================= TAB 2: GIỚI THIỆU TÁC GIẢ ================= -->
+        <div id="tab-content-about" class="w-full h-full overflow-y-auto p-4 md:p-8 custom-scrollbar hidden">
+            <div class="max-w-4xl mx-auto space-y-6 pb-12">
+                
+                <div class="bg-gradient-to-r from-pink-200 via-rose-200 to-sky-200 rounded-3xl p-6 md:p-8 text-slate-800 shadow-sm border border-pink-200/60 relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-8 opacity-20 text-9xl font-bold select-none text-rose-400">🩺</div>
+                    
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
+                        <div class="w-24 h-24 rounded-2xl bg-white/70 backdrop-blur-md border border-white/80 flex items-center justify-center text-4xl shadow-2xs shrink-0">
+                            💉
+                        </div>
+                        <div class="text-center sm:text-left space-y-2">
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                <span class="px-3 py-1 rounded-full bg-white/70 backdrop-blur-md text-[11px] font-semibold tracking-wider uppercase text-rose-700 border border-rose-200/50">
+                                    <i class="fa-solid fa-heart-pulse mr-1"></i> Tác Giả & Phát Triển
+                                </span>
+                            </div>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800">Dương Ngọc Yến Nhi</h2>
+                            <p class="text-sm font-semibold text-rose-700 flex items-center justify-center sm:justify-start gap-1.5">
+                                <i class="fa-solid fa-user-nurse"></i> Sinh viên Điều dưỡng
+                            </p>
+                            
+                            <p class="text-xs text-slate-700 max-w-2xl leading-relaxed pt-1 font-normal">
+                                "Sự thấu hiểu và chăm sóc bắt đầu từ những việc nhỏ nhất." Lạc vào những trang tài liệu mênh mông, những buổi bài tập nhóm dài vô tận trước màn hình laptop... bạn có từng giật mình nhận ra chiếc đồng hồ sinh học đã trôi xa? Trang web này ra đời để đồng hành cùng bạn cân bằng thời gian và chăm sóc sức khỏe bản thân.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white/90 p-6 rounded-3xl border border-rose-100 shadow-2xs space-y-3 relative overflow-hidden">
+                        <div class="w-2 h-full bg-rose-300 absolute left-0 top-0"></div>
+                        <div class="flex items-center gap-3 text-rose-700 pl-2">
+                            <div class="w-10 h-10 rounded-2xl bg-rose-50 flex items-center justify-center text-lg font-bold text-rose-500">
+                                <i class="fa-solid fa-stethoscope"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800 text-base">Hành Trình Học Tập & Câu Chuyện</h3>
+                        </div>
+                        <p class="text-slate-600 text-xs sm:text-sm leading-relaxed pl-2">
+                            Hành trình của tôi luôn gắn liền với <strong>áp lực học tập, bài vở và những giờ làm việc căng thẳng trước màn hình</strong>. Sự tập trung giúp ta giỏi chuyên môn, nhưng nó cũng là "con dao hai lưỡi" khiến ta dễ quên mất giờ ăn, giờ uống nước hay giờ nghỉ ngơi.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/90 p-6 rounded-3xl border border-sky-100 shadow-2xs space-y-3 relative overflow-hidden">
+                        <div class="w-2 h-full bg-sky-300 absolute left-0 top-0"></div>
+                        <div class="flex items-center gap-3 text-sky-700 pl-2">
+                            <div class="w-10 h-10 rounded-2xl bg-sky-50 flex items-center justify-center text-lg font-bold text-sky-500">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800 text-base">Sứ Mệnh Của SAVE OUR TIME</h3>
+                        </div>
+                        <p class="text-slate-600 text-xs sm:text-sm leading-relaxed pl-2">
+                            Một người làm việc hiệu quả không chỉ chăm lo công việc mà còn phải biết tự chăm sóc chính mình. Ứng dụng này đóng vai trò như một <strong>"người đồng hành nhắc nhở"</strong> kiên nhẫn, giúp bạn chủ động ghi chú, hẹn giờ báo thức chuẩn xác và duy trì lối sống lành mạnh.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white/90 p-6 rounded-3xl border border-purple-100 shadow-2xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-purple-50 pb-3">
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-kit-medical text-rose-400"></i> Lời Khuyên Sức Khỏe
+                        </h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                        <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-100 space-y-2">
+                            <div class="font-bold text-amber-900 text-sm flex items-center gap-2">
+                                <span class="p-1.5 bg-amber-100/80 rounded-xl text-amber-700"><i class="fa-solid fa-utensils"></i></span> Dinh Dưỡng Bữa Ăn
+                            </div>
+                            <p class="text-amber-800/90 leading-relaxed">
+                                Đừng bỏ bữa kể cả khi tập trung làm việc hay học tập. Ăn đúng giờ bảo vệ dạ dày khỏi axit dư thừa và duy trì thể lực lâu dài.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-sky-50/70 border border-sky-100 space-y-2">
+                            <div class="font-bold text-sky-900 text-sm flex items-center gap-2">
+                                <span class="p-1.5 bg-sky-100/80 rounded-xl text-sky-700"><i class="fa-solid fa-droplet"></i></span> Bổ Sung Nước Đều Đặn
+                            </div>
+                            <p class="text-sky-800/90 leading-relaxed">
+                                Uống nước từng ngụm nhỏ mỗi 30-45 phút giúp duy trì độ ẩm cho mắt, tăng lưu thông máu và giữ cho não bộ luôn tỉnh táo.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 space-y-2">
+                            <div class="font-bold text-purple-900 text-sm flex items-center gap-2">
+                                <span class="p-1.5 bg-purple-100/80 rounded-xl text-purple-700"><i class="fa-solid fa-bed"></i></span> Phục Hồi & Giấc Ngủ
+                            </div>
+                            <p class="text-purple-800/90 leading-relaxed">
+                                Dành 15-20 phút chợp mắt nghỉ ngơi giữa giờ làm giúp tái tạo năng lượng, giải tỏa căng thẳng thần kinh và tăng khả năng tập trung.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-rose-100 via-purple-100 to-sky-100 text-slate-700 p-5 rounded-2xl text-center text-xs space-y-1 shadow-2xs border border-rose-200/40">
+                    <p class="font-semibold text-rose-900">❤️ Chúc bạn luôn giữ vững sức khỏe, năng lượng tích cực và hoàn thành xuất sắc mọi mục tiêu!</p>
+                    <p class="text-[11px] text-slate-500">Thiết kế bởi Dương Ngọc Yến Nhi - Sinh viên Điều dưỡng</p>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= MODAL 1: CÀI ĐẶT BÁNH RĂNG (SETTINGS) ================= -->
+    <div id="settings-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-sky-500"></i> Cài Đặt Hệ Thống
+                </h3>
+                <button id="btn-close-settings" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <!-- Sound Options -->
+                <div class="bg-slate-50 p-4 rounded-2xl space-y-3">
+                    <h4 class="font-bold text-slate-700 flex items-center gap-2 text-xs uppercase tracking-wider">
+                        <i class="fa-solid fa-volume-high text-sky-500"></i> Âm Thanh Báo Thức
+                    </h4>
+                    
+                    <div class="space-y-1">
+                        <label class="text-slate-500 font-medium">Kiểu Chuông</label>
+                        <select id="setting-sound-type" class="w-full p-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-200">
+                            <option value="chime">Triple Chime (Chuông nhẹ nhàng)</option>
+                            <option value="zen">Zen Singing Bowl (Tĩnh tâm)</option>
+                            <option value="marimba">Marimba Arpeggio (Ấm áp)</option>
+                            <option value="birds">Morning Chirps (Tiếng chim)</option>
+                            <option value="beep">Digital Beep (Hiện đại)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-slate-500 font-medium">
+                            <label>Âm Lượng</label>
+                            <span id="setting-volume-label">70%</span>
+                        </div>
+                        <input type="range" id="setting-volume" min="0" max="100" value="70" class="w-full accent-sky-500 cursor-pointer">
+                    </div>
+
+                    <button id="btn-test-sound" class="w-full bg-sky-100 hover:bg-sky-200 text-sky-800 py-1.5 rounded-xl font-medium transition-colors flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-play"></i> Nghe Thử Âm Thanh
+                    </button>
+                </div>
+
+                <!-- Vital Alert Settings -->
+                <div class="bg-emerald-50/60 p-4 rounded-2xl space-y-3 border border-emerald-100">
+                    <h4 class="font-bold text-emerald-900 flex items-center gap-2 text-xs uppercase tracking-wider">
+                        <i class="fa-solid fa-heart-pulse text-emerald-500"></i> Nhắc Nhở Sinh Tồn & Sức Khỏe
+                    </h4>
+
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-700 font-medium">Tự động nhắc định kỳ</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="setting-vital-toggle" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-slate-500 font-medium">Tần suất nhắc (Phút)</label>
+                        <input type="number" id="setting-vital-interval" min="15" max="180" value="45" class="w-full p-2 bg-white border border-emerald-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-200 text-center font-mono">
+                    </div>
+
+                    <button id="btn-trigger-test-vital" class="w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 py-1.5 rounded-xl font-medium transition-colors flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-sparkles"></i> Thử Hiển Thị Nhắc Nhở
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-2">
+                <button id="btn-save-settings" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium text-xs py-2.5 rounded-xl transition-colors shadow-2xs">
+                    Lưu Cài Đặt
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 2: CONFIRM DELETE MODAL ================= -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-500 flex items-center justify-center text-xl mx-auto">
+                <i class="fa-solid fa-trash"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="font-bold text-slate-800 text-base">Xác nhận xóa ghi chú?</h3>
+                <p class="text-xs text-slate-500">Hành động này không thể hoàn tác và các lịch nhắc nhở thuộc ghi chú này cũng sẽ bị hủy.</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button id="btn-cancel-delete" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-medium transition-colors">
+                    Hủy bỏ
+                </button>
+                <button id="btn-confirm-delete" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white py-2 rounded-xl text-xs font-medium transition-colors shadow-2xs">
+                    Xóa luôn
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 3: DAILY ENERGY CARD ================= -->
+    <div id="daily-energy-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-sparkles text-amber-500"></i> Thẻ Năng Lượng Đầu Ngày
+                </h3>
+                <button id="btn-close-daily-energy" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Card Flipper Container -->
+            <div id="card-flipper" class="card-perspective w-48 h-72 mx-auto cursor-pointer">
+                <div id="card-inner" class="card-inner relative w-full h-full shadow-xl rounded-2xl">
+                    <!-- Front -->
+                    <div class="card-front absolute inset-0 bg-gradient-to-tr from-amber-200 via-rose-200 to-purple-200 rounded-2xl border-2 border-white flex flex-col items-center justify-center p-4 text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-white/60 backdrop-blur-md flex items-center justify-center text-3xl mb-3 text-amber-700">
+                            ✨
+                        </div>
+                        <h4 class="font-bold text-amber-900 text-sm">Chạm để Rút Thẻ</h4>
+                        <p class="text-[11px] text-amber-800/80 mt-1">Thông điệp tích cực dành riêng cho bạn</p>
+                    </div>
+                    <!-- Back -->
+                    <div class="card-back absolute inset-0 bg-gradient-to-tr from-sky-100 via-indigo-100 to-rose-100 rounded-2xl border-2 border-white flex flex-col justify-between p-4 text-center">
+                        <div class="flex justify-between items-center text-[10px] font-bold text-indigo-700">
+                            <span id="card-element">Yếu tố</span>
+                            <span id="card-number">#01</span>
+                        </div>
+                        <div class="my-auto">
+                            <div id="card-icon" class="text-4xl mb-2">🌟</div>
+                            <h4 id="card-title" class="font-extrabold text-indigo-900 text-base">Tên Thẻ</h4>
+                            <p id="card-subtitle" class="text-[11px] text-indigo-600 font-medium">Chủ đề</p>
+                        </div>
+                        <div class="text-[9px] text-indigo-400">SAVE OUR TIME</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Box -->
+            <div id="card-details-box" class="space-y-3 hidden animate-in fade-in duration-300">
+                <div class="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-100 space-y-1 text-xs">
+                    <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-comment-dots text-amber-500"></i> Thông điệp hôm nay:
+                    </div>
+                    <p id="card-message" class="text-slate-700 italic leading-relaxed"></p>
+                </div>
+
+                <div class="bg-emerald-50/80 p-3.5 rounded-2xl border border-emerald-100 space-y-1 text-xs">
+                    <div class="font-bold text-emerald-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-heart-pulse text-emerald-500"></i> Lời khuyên sức khỏe:
+                    </div>
+                    <p id="card-health-tip" class="text-slate-700 leading-relaxed"></p>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-draw-again" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-medium transition-colors">
+                        Rút thẻ khác
+                    </button>
+                    <button id="btn-close-energy-done" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-xl text-xs font-medium transition-colors shadow-2xs">
+                        Nhận Năng Lượng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 4: VITAL ALERT POPUP ================= -->
+    <div id="vital-alert-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden opacity-0 translate-y-4 transition-all duration-300">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-emerald-100 text-center space-y-4">
+            <button id="btn-close-vital-modal" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="vital-alert-icon" class="text-5xl animate-bounce">
+                💧
+            </div>
+            <div class="space-y-1.5">
+                <span id="vital-alert-tag" class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    Nhắc Nhở Sinh Tồn
+                </span>
+                <h3 id="vital-alert-title" class="font-extrabold text-slate-800 text-lg">Đã đến lúc uống nước!</h3>
+                <p id="vital-alert-msg" class="text-xs text-slate-600 leading-relaxed px-2">
+                    Một ngụm nước ấm sẽ giúp bạn tỉnh táo và bảo vệ sức khỏe.
+                </p>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button id="btn-vital-snooze" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-medium transition-colors">
+                    Thắc nữa (10p)
+                </button>
+                <button id="btn-vital-ack" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-xl text-xs font-medium transition-colors shadow-2xs">
+                    Đã hoàn thành!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 5: GUIDE MODAL ================= -->
+    <div id="guide-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i> Hướng Dẫn & Mẹo Sử Dụng Thông Minh
+                </h3>
+                <button id="btn-close-guide" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Tip 1: Auto Reminders -->
+                <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-100/80 space-y-2">
+                    <div class="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wide">
+                        <span class="w-6 h-6 rounded-lg bg-amber-200/70 text-amber-800 flex items-center justify-center text-xs">1</span>
+                        <span>Tạo Nhắc Nhở Tự Động Từ Ghi Chú</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Bạn chỉ cần gõ nội dung công việc vào Sổ Tay Ghi Chú. Hệ thống sẽ <strong>tự động quét các mốc thời gian</strong> và thêm vào danh sách nhắc nhở!
+                    </p>
+                    <div class="bg-white/90 p-2.5 rounded-xl border border-amber-200/60 text-[11px] text-slate-700 space-y-1 font-mono">
+                        <div class="text-emerald-700 font-semibold font-sans">💡 Mẹo viết rõ ràng nhất:</div>
+                        <div><strong class="text-amber-800">- 7h30 Uống 1 ly nước ấm</strong></div>
+                        <div><strong class="text-amber-800">- 10:15 Học bài Điều dưỡng</strong></div>
+                        <div><strong class="text-amber-800">- 16h30 Đi tập thể dục</strong></div>
+                    </div>
+                    <p class="text-[11px] text-amber-800 italic">
+                        👉 <strong>Lưu ý:</strong> Thêm dấu gạch ngang "<strong>-</strong>" hoặc "<strong>*</strong>" ở đầu dòng giúp danh sách công việc gọn gàng và tạo tiêu đề nhắc nhở chính xác nhất.
+                    </p>
+                </div>
+
+                <!-- Tip 2: PiP Window -->
+                <div class="bg-sky-50/60 p-4 rounded-2xl border border-sky-100/80 space-y-2">
+                    <div class="flex items-center gap-2 text-sky-900 font-bold text-xs uppercase tracking-wide">
+                        <span class="w-6 h-6 rounded-lg bg-sky-200/70 text-sky-800 flex items-center justify-center text-xs">2</span>
+                        <span>Ghim Cửa Sổ Nổi Desktop (Picture-in-Picture)</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Bấm nút <span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium text-[11px]"><i class="fa-solid fa-up-right-from-square"></i> Ghim Nổi</span> góc trên ghi chú để mở cửa sổ ghi chú thu nhỏ luôn hiển thị trên màn hình máy tính. Giúp bạn vừa học/làm việc ở ứng dụng khác mà vẫn xem được ghi chú!
+                    </p>
+                </div>
+
+                <!-- Tip 3: AI Assistant & Vital Alerts -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="bg-purple-50/60 p-3 rounded-2xl border border-purple-100/80 space-y-1.5">
+                        <div class="font-bold text-purple-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i> AI Trợ Lý
+                        </div>
+                        <p class="text-slate-600 text-[11px] leading-relaxed">
+                            Bấm các nút AI phía trên ghi chú để <strong>Làm mượt văn bản</strong>, <strong>Tóm tắt nội dung</strong> hoặc <strong>Tạo danh sách To-do</strong> tự động.
+                        </p>
+                    </div>
+
+                    <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100/80 space-y-1.5">
+                        <div class="font-bold text-emerald-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-heart-pulse text-emerald-500"></i> Nhắc Nhở Sinh Tồn
+                        </div>
+                        <p class="text-slate-600 text-[11px] leading-relaxed">
+                            Bật tính năng trong Cài Đặt (⚙️) để ứng dụng tự động nhắc bạn <strong>uống nước, nghỉ mắt và vươn vai</strong> định kỳ.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button id="btn-close-guide-done" class="bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs px-5 py-2.5 rounded-xl transition-colors shadow-2xs">
+                    Đã hiểu! ✨
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Video and Canvas for PiP Fallback -->
+    <video id="pip-video" class="hidden" autoplay muted></video>
+    <canvas id="pip-canvas" width="400" height="300" class="hidden"></canvas>
+
+    <script type="module">
+        // --- CẤP QUYỀN THÔNG BÁO DESKTOP NATIVE ---
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                    Notification.requestPermission();
+                }
+            }
+        }
+
+        // --- HÀM GỬI THÔNG BÁO RA NGOÀI DESKTOP ---
+        function sendDesktopNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                const notif = new Notification(title, {
+                    body: body,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/2921/2921222.png', // Icon y tế/đồng hồ chung
+                    requireInteraction: true // Giữ thông báo trên màn hình cho đến khi người dùng tắt
+                });
+                
+                notif.onclick = () => {
+                    window.focus(); // Nhấn vào thông báo sẽ mở/quay lại tab ứng dụng
+                    notif.close();
+                };
+            }
+        }
+
+        // --- Toast Notification Utility ---
+        function showToast(title, message, type = 'info') {
+            const colors = {
+                success: 'border-emerald-400 text-emerald-800 bg-emerald-50',
+                error: 'border-rose-400 text-rose-800 bg-rose-50',
+                info: 'border-sky-400 text-sky-800 bg-sky-50'
+            };
+
+            const notif = document.createElement('div');
+            notif.className = `fixed top-4 right-4 max-w-xs w-full bg-white border-l-4 p-3 rounded-xl shadow-lg z-[100] transition-all duration-300 flex items-start gap-2.5 ${colors[type] || colors.info}`;
+            notif.innerHTML = `
+                <div class="flex-1 text-xs">
+                    <h5 class="font-bold leading-tight mb-0.5">${title}</h5>
+                    <p class="text-[11px] opacity-90">${message}</p>
+                </div>
+                <button class="text-slate-400 hover:text-slate-600 text-xs" onclick="this.closest('.fixed').remove()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            document.body.appendChild(notif);
+            setTimeout(() => {
+                if (document.body.contains(notif)) {
+                    notif.style.opacity = '0';
+                    setTimeout(() => notif.remove(), 300);
+                }
+            }, 4000);
+        }
+
+        // --- State Management ---
+        let notes = JSON.parse(localStorage.getItem('local_notes')) || [];
+        let currentNoteId = null;
+        let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+        
+        let timerInterval;
+        let timerRemaining = 0;
+        let isTimerRunning = false;
+
+        // Custom Settings State
+        let settings = JSON.parse(localStorage.getItem('user_settings')) || {
+            soundType: 'chime',
+            volume: 70,
+            vitalEnabled: true,
+            vitalIntervalMinutes: 45
+        };
+
+        // Vital Alert Interval Timer
+        let vitalTimerInterval = null;
+        let lastVitalTime = Date.now();
+
+        // PiP variables
+        let isPipActive = false;
+        let pipAnimationFrameId = null;
+
+        // Safe DOM getter helper
+        const getEl = (id) => document.getElementById(id);
+
+        const els = {
+            // Tab Switchers
+            tabBtnApp: getEl('tab-btn-app'),
+            tabBtnAbout: getEl('tab-btn-about'),
+            tabContentApp: getEl('tab-content-app'),
+            tabContentAbout: getEl('tab-content-about'),
+
+            // Time & Timer
+            currentTime: getEl('current-time'),
+            timerMin: getEl('timer-min'),
+            timerSec: getEl('timer-sec'),
+            timerInputs: getEl('timer-inputs'),
+            timerDisplay: getEl('timer-display'),
+            btnStartTimer: getEl('btn-start-timer'),
+            btnStopTimer: getEl('btn-stop-timer'),
+            btnResetTimer: getEl('btn-reset-timer'),
+
+            // Reminders
+            reminderText: getEl('reminder-text'),
+            reminderTime: getEl('reminder-time'),
+            btnSetReminder: getEl('btn-set-reminder'),
+            activeRemindersList: getEl('active-reminders-list'),
+
+            // Notes Editor
+            notesList: getEl('notes-list'),
+            searchNote: getEl('search-note'),
+            emptyState: getEl('empty-state'),
+            editorContainer: getEl('note-editor-container'),
+            noNoteSelected: getEl('no-note-selected'),
+            titleInput: getEl('note-title-input'),
+            contentInput: getEl('note-content-input'),
+            lastEdited: getEl('note-last-edited'),
+            btnNewNote: getEl('btn-new-note'),
+            btnSaveNote: getEl('btn-save-note'),
+            btnDeleteNote: getEl('btn-delete-note'),
+            btnPinNote: getEl('btn-pin-note'),
+
+            // Confirm Delete Modal
+            confirmModal: getEl('confirm-modal'),
+            btnCancelDelete: getEl('btn-cancel-delete'),
+            btnConfirmDelete: getEl('btn-confirm-delete'),
+
+            // AI Buttons
+            btnAiImprove: getEl('btn-ai-improve'),
+            btnAiSummarize: getEl('btn-ai-summarize'),
+            btnAiTodos: getEl('btn-ai-todos'),
+
+            // Guide Modal Elements
+            btnOpenGuide: getEl('btn-open-guide'),
+            btnOpenGuideLink: getEl('btn-open-guide-link'),
+            btnCloseGuide: getEl('btn-close-guide'),
+            btnCloseGuideDone: getEl('btn-close-guide-done'),
+            guideModal: getEl('guide-modal'),
+
+            // Settings Modal Elements
+            btnOpenSettings: getEl('btn-open-settings'),
+            btnCloseSettings: getEl('btn-close-settings'),
+            settingsModal: getEl('settings-modal'),
+            settingSoundType: getEl('setting-sound-type'),
+            settingVolume: getEl('setting-volume'),
+            settingVolumeLabel: getEl('setting-volume-label'),
+            settingVitalToggle: getEl('setting-vital-toggle'),
+            settingVitalInterval: getEl('setting-vital-interval'),
+            btnTestSound: getEl('btn-test-sound'),
+            btnTriggerTestVital: getEl('btn-trigger-test-vital'),
+            btnSaveSettings: getEl('btn-save-settings'),
+            vitalBadge: getEl('vital-alert-status-badge'),
+
+            // Daily Energy Card Elements
+            btnOpenDailyEnergy: getEl('btn-open-daily-energy'),
+            btnCloseDailyEnergy: getEl('btn-close-daily-energy'),
+            dailyEnergyModal: getEl('daily-energy-modal'),
+            cardFlipper: getEl('card-flipper'),
+            cardInner: getEl('card-inner'),
+            cardElement: getEl('card-element'),
+            cardNumber: getEl('card-number'),
+            cardIcon: getEl('card-icon'),
+            cardTitle: getEl('card-title'),
+            cardSubtitle: getEl('card-subtitle'),
+            cardDetailsBox: getEl('card-details-box'),
+            cardMessage: getEl('card-message'),
+            cardHealthTip: getEl('card-health-tip'),
+            btnDrawAgain: getEl('btn-draw-again'),
+            btnCloseEnergyDone: getEl('btn-close-energy-done'),
+
+            // Vital Alert Popup Modal
+            vitalAlertModal: getEl('vital-alert-modal'),
+            vitalAlertIcon: getEl('vital-alert-icon'),
+            vitalAlertTitle: getEl('vital-alert-title'),
+            vitalAlertMsg: getEl('vital-alert-msg'),
+            vitalAlertTag: getEl('vital-alert-tag'),
+            btnCloseVitalModal: getEl('btn-close-vital-modal'),
+            btnVitalAck: getEl('btn-vital-ack'),
+            btnVitalSnooze: getEl('btn-vital-snooze'),
+
+            // PiP Elements
+            pipVideo: getEl('pip-video'),
+            pipCanvas: getEl('pip-canvas')
+        };
+
+        let audioCtx = null;
+
+        function playCustomSound(type = settings.soundType, volPercent = settings.volume) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const now = audioCtx.currentTime;
+                const masterGain = audioCtx.createGain();
+                const volume = Math.max(0, Math.min(1, volPercent / 100));
+                masterGain.gain.setValueAtTime(volume, now);
+                masterGain.connect(audioCtx.destination);
+
+                if (type === 'chime') {
+                    const freqs = [659.25, 987.77, 1318.51];
+                    freqs.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.15);
+
+                        gain.gain.setValueAtTime(0, now + idx * 0.15);
+                        gain.gain.linearRampToValueAtTime(0.3, now + idx * 0.15 + 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.15 + 1.2);
+
+                        osc.connect(gain);
+                        gain.connect(masterGain);
+                        osc.start(now + idx * 0.15);
+                        osc.stop(now + idx * 0.15 + 1.3);
+                    });
+                } else if (type === 'zen') {
+                    const osc = audioCtx.createOscillator();
+                    const osc2 = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(322, now);
+
+                    gain.gain.setValueAtTime(0.01, now);
+                    gain.gain.linearRampToValueAtTime(0.4, now + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+
+                    osc.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(masterGain);
+
+                    osc.start(now);
+                    osc2.start(now);
+                    osc.stop(now + 2.6);
+                    osc2.stop(now + 2.6);
+                } else if (type === 'beep') {
+                    for (let i = 0; i < 3; i++) {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(880, now + i * 0.2);
+
+                        gain.gain.setValueAtTime(0.15, now + i * 0.2);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.2 + 0.1);
+
+                        osc.connect(gain);
+                        gain.connect(masterGain);
+                        osc.start(now + i * 0.2);
+                        osc.stop(now + i * 0.2 + 0.12);
+                    }
+                } else if (type === 'marimba') {
+                    const notes = [261.63, 329.63, 392.00, 523.25];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+
+                        gain.gain.setValueAtTime(0.4, now + idx * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.4);
+
+                        osc.connect(gain);
+                        gain.connect(masterGain);
+                        osc.start(now + idx * 0.1);
+                        osc.stop(now + idx * 0.1 + 0.45);
+                    });
+                } else if (type === 'birds') {
+                    const birdChirp = (delay, baseFreq) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(baseFreq, now + delay);
+                        osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + delay + 0.08);
+
+                        gain.gain.setValueAtTime(0, now + delay);
+                        gain.gain.linearRampToValueAtTime(0.2, now + delay + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.12);
+
+                        osc.connect(gain);
+                        gain.connect(masterGain);
+                        osc.start(now + delay);
+                        osc.stop(now + delay + 0.15);
+                    };
+                    
+                    birdChirp(0, 2000);
+                    birdChirp(0.1, 2400);
+                    birdChirp(0.3, 2200);
+                    birdChirp(0.4, 2800);
+                    birdChirp(0.7, 2000);
+                    birdChirp(0.8, 2600);
+                }
+            } catch (e) {
+                console.error("Lỗi phát âm thanh:", e);
+                showToast("Báo thức", "Đã đến giờ nhắc nhở!", 'info');
+            }
+        }
+
+        async function openDocumentPiP(noteTitle, noteContent) {
+            if (!('documentPictureInPicture' in window)) {
+                openCanvasPiP(noteTitle, noteContent);
+                return;
+            }
+
+            try {
+                const pipWindow = await window.documentPictureInPicture.requestWindow({
+                    width: 350,
+                    height: 400
+                });
+
+                const styles = [...document.styleSheets];
+                styles.forEach((styleSheet) => {
+                    try {
+                        const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+                        const style = document.createElement('style');
+                        style.textContent = cssRules;
+                        pipWindow.document.head.appendChild(style);
+                    } catch (e) {
+                        const link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        link.type = styleSheet.type;
+                        link.media = styleSheet.media;
+                        link.href = styleSheet.href;
+                        pipWindow.document.head.appendChild(link);
+                    }
+                });
+                
+                const faLink = document.createElement('link');
+                faLink.rel = 'stylesheet';
+                faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+                pipWindow.document.head.appendChild(faLink);
+
+                const container = pipWindow.document.createElement('div');
+                container.className = 'pip-container';
+
+                const header = pipWindow.document.createElement('div');
+                header.className = 'pip-header';
+                
+                const titleSpan = pipWindow.document.createElement('span');
+                titleSpan.className = 'pip-title';
+                titleSpan.innerHTML = `<i class="fa-solid fa-note-sticky text-sky-500 mr-2"></i>${noteTitle || 'Ghi chú không tên'}`;
+                
+                header.appendChild(titleSpan);
+
+                const contentArea = pipWindow.document.createElement('div');
+                contentArea.className = 'pip-content-area custom-scrollbar';
+                contentArea.textContent = noteContent || 'Chưa có nội dung.';
+                
+                const updateInterval = setInterval(() => {
+                    if (currentNoteId) {
+                        const currentNote = notes.find(n => n.id === currentNoteId);
+                        if (currentNote) {
+                            titleSpan.innerHTML = `<i class="fa-solid fa-note-sticky text-sky-500 mr-2"></i>${currentNote.title || 'Ghi chú không tên'}`;
+                            contentArea.textContent = currentNote.content || 'Chưa có nội dung.';
+                        }
+                    }
+                }, 1000);
+
+                pipWindow.addEventListener("pagehide", () => {
+                    clearInterval(updateInterval);
+                });
+
+                container.appendChild(header);
+                container.appendChild(contentArea);
+                pipWindow.document.body.appendChild(container);
+                pipWindow.document.body.classList.add('pip-mode');
+
+            } catch (error) {
+                console.error("Document Picture-in-Picture failed. Trying canvas fallback.", error);
+                openCanvasPiP(noteTitle, noteContent);
+            }
+        }
+
+        async function openCanvasPiP(noteTitle, noteContent) {
+            const video = els.pipVideo;
+            const canvas = els.pipCanvas;
+            if (!video || !canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            
+            if (isPipActive && document.pictureInPictureElement) {
+                await document.exitPictureInPicture().catch(() => {});
+            }
+            if (pipAnimationFrameId) {
+                cancelAnimationFrame(pipAnimationFrameId);
+            }
+
+            function wrapText(context, text, x, y, maxWidth, lineHeight) {
+                const lines = text.split('\n');
+                let currentY = y;
+                for (let i = 0; i < lines.length; i++) {
+                    const words = lines[i].split(' ');
+                    let line = '';
+                    for (let n = 0; n < words.length; n++) {
+                        const testLine = line + words[n] + ' ';
+                        const metrics = context.measureText(testLine);
+                        if (metrics.width > maxWidth && n > 0) {
+                            context.fillText(line, x, currentY);
+                            line = words[n] + ' ';
+                            currentY += lineHeight;
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    context.fillText(line, x, currentY);
+                    currentY += lineHeight;
+                }
+            }
+
+            function drawPiPFrame() {
+                let currentTitle = noteTitle;
+                let currentText = noteContent;
+                if (currentNoteId) {
+                    const n = notes.find(n => n.id === currentNoteId);
+                    if (n) {
+                        currentTitle = n.title;
+                        currentText = n.content;
+                    }
+                }
+
+                ctx.fillStyle = '#fdfdfd';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0, 0, canvas.width, 36);
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.beginPath();
+                ctx.moveTo(0, 36);
+                ctx.lineTo(canvas.width, 36);
+                ctx.stroke();
+
+                ctx.fillStyle = '#334155';
+                ctx.font = 'bold 14px Arial, sans-serif';
+                ctx.fillText(`📌 ${currentTitle || 'Ghi chú'}`, 12, 24);
+
+                ctx.fillStyle = '#475569';
+                ctx.font = '13px Arial, sans-serif';
+                wrapText(ctx, currentText || 'Nội dung trống...', 12, 56, canvas.width - 24, 20);
+
+                if (isPipActive) {
+                    pipAnimationFrameId = requestAnimationFrame(drawPiPFrame);
+                }
+            }
+
+            isPipActive = true;
+            drawPiPFrame();
+
+            try {
+                const stream = canvas.captureStream(30);
+                video.srcObject = stream;
+                video.muted = true;
+                
+                await video.play();
+                await video.requestPictureInPicture();
+                
+                video.addEventListener('leavepictureinpicture', () => {
+                    isPipActive = false;
+                    cancelAnimationFrame(pipAnimationFrameId);
+                }, { once: true });
+
+            } catch (error) {
+                console.error("Canvas PiP failed:", error);
+                showToast("Lỗi", "Trình duyệt không hỗ trợ hoặc bị chặn quyền mở cửa sổ nổi (Picture-in-Picture).", 'error');
+            }
+        }
+
+        if (els.btnPinNote) {
+            els.btnPinNote.addEventListener('click', () => {
+                if (!currentNoteId) return;
+                const title = els.titleInput ? els.titleInput.value : '';
+                const content = els.contentInput ? els.contentInput.value : '';
+                saveNote();
+                openDocumentPiP(title, content);
+            });
+        }
+
+        function switchTab(tabId) {
+            if (els.tabBtnApp) els.tabBtnApp.classList.remove('active', 'active-rose');
+            if (els.tabBtnAbout) els.tabBtnAbout.classList.remove('active', 'active-rose');
+            if (els.tabBtnApp) els.tabBtnApp.classList.add('text-slate-600');
+            if (els.tabBtnAbout) els.tabBtnAbout.classList.add('text-slate-600');
+            
+            if (els.tabContentApp) els.tabContentApp.classList.add('hidden');
+            if (els.tabContentAbout) els.tabContentAbout.classList.add('hidden');
+
+            if (tabId === 'app') {
+                if (els.tabBtnApp) {
+                    els.tabBtnApp.classList.add('active');
+                    els.tabBtnApp.classList.remove('text-slate-600');
+                }
+                if (els.tabContentApp) els.tabContentApp.classList.remove('hidden');
+            } else if (tabId === 'about') {
+                if (els.tabBtnAbout) {
+                    els.tabBtnAbout.classList.add('active-rose');
+                    els.tabBtnAbout.classList.remove('text-slate-600');
+                }
+                if (els.tabContentAbout) els.tabContentAbout.classList.remove('hidden');
+            }
+        }
+
+        if (els.tabBtnApp) els.tabBtnApp.addEventListener('click', () => switchTab('app'));
+        if (els.tabBtnAbout) els.tabBtnAbout.addEventListener('click', () => switchTab('about'));
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
+            if (els.currentTime) els.currentTime.textContent = timeString;
+            checkReminders(now);
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerRemaining / 60);
+            const seconds = timerRemaining % 60;
+            if (els.timerDisplay) els.timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function playAlarm() {
+            playCustomSound(settings.soundType, settings.volume);
+            
+            // Hiện thông báo ra ngoài Desktop
+            sendDesktopNotification("⏰ HẾT GIỜ!", "Thời gian đếm ngược của bạn đã kết thúc.");
+            
+            const alarmDiv = document.createElement('div');
+            alarmDiv.className = 'fixed inset-0 bg-rose-500/20 backdrop-blur-sm z-50 flex items-center justify-center pointer-events-none animate-pulse';
+            alarmDiv.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 shadow-2xl text-center transform scale-110 border-4 border-rose-200">
+                    <div class="text-6xl mb-4 animate-bounce">⏰</div>
+                    <h2 class="text-2xl font-bold text-rose-600 mb-2">HẾT GIỜ!</h2>
+                </div>
+            `;
+            document.body.appendChild(alarmDiv);
+            
+            setTimeout(() => {
+                if (document.body.contains(alarmDiv)) document.body.removeChild(alarmDiv);
+            }, 3000);
+        }
+
+        if (els.btnStartTimer) {
+            els.btnStartTimer.addEventListener('click', () => {
+                // Xin quyền thông báo khi người dùng tương tác
+                requestNotificationPermission();
+
+                if (isTimerRunning) return;
+                
+                if (timerRemaining === 0) {
+                    const min = parseInt(els.timerMin ? els.timerMin.value : 0) || 0;
+                    const sec = parseInt(els.timerSec ? els.timerSec.value : 0) || 0;
+                    timerRemaining = min * 60 + sec;
+                    
+                    if (timerRemaining <= 0) return;
+                }
+
+                isTimerRunning = true;
+                if (els.timerInputs) els.timerInputs.classList.add('hidden');
+                if (els.timerDisplay) els.timerDisplay.classList.remove('hidden');
+                if (els.btnStartTimer) els.btnStartTimer.classList.add('hidden');
+                if (els.btnStopTimer) els.btnStopTimer.classList.remove('hidden');
+                
+                updateTimerDisplay();
+
+                timerInterval = setInterval(() => {
+                    timerRemaining--;
+                    updateTimerDisplay();
+
+                    if (timerRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        if (els.timerInputs) els.timerInputs.classList.remove('hidden');
+                        if (els.timerDisplay) els.timerDisplay.classList.add('hidden');
+                        if (els.btnStartTimer) els.btnStartTimer.classList.remove('hidden');
+                        if (els.btnStopTimer) els.btnStopTimer.classList.add('hidden');
+                        playAlarm();
+                    }
+                }, 1000);
+            });
+        }
+
+        if (els.btnStopTimer) {
+            els.btnStopTimer.addEventListener('click', () => {
+                if (!isTimerRunning) return;
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                if (els.btnStartTimer) els.btnStartTimer.classList.remove('hidden');
+                if (els.btnStopTimer) els.btnStopTimer.classList.add('hidden');
+            });
+        }
+
+        if (els.btnResetTimer) {
+            els.btnResetTimer.addEventListener('click', () => {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                timerRemaining = 0;
+                if (els.timerInputs) els.timerInputs.classList.remove('hidden');
+                if (els.timerDisplay) els.timerDisplay.classList.add('hidden');
+                if (els.btnStartTimer) els.btnStartTimer.classList.remove('hidden');
+                if (els.btnStopTimer) els.btnStopTimer.classList.add('hidden');
+            });
+        }
+
+        function renderReminders() {
+            if (!els.activeRemindersList) return;
+            els.activeRemindersList.innerHTML = '';
+            reminders.sort((a, b) => a.time.localeCompare(b.time));
+            
+            if (reminders.length === 0) {
+                els.activeRemindersList.innerHTML = '<p class="text-xs text-center text-slate-400 py-2">Chưa có lịch nhắc nhở</p>';
+                return;
+            }
+
+            reminders.forEach(reminder => {
+                const item = document.createElement('div');
+                item.className = 'flex justify-between items-center p-2.5 bg-white border border-rose-100 rounded-xl shadow-2xs group hover:bg-rose-50 transition-colors';
+                
+                const now = new Date();
+                const currentStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                const isPast = currentStr > reminder.time && !reminder.completed;
+                
+                item.innerHTML = `
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <div class="w-8 h-8 rounded-lg ${reminder.completed ? 'bg-emerald-100 text-emerald-600' : isPast ? 'bg-amber-100 text-amber-600' : 'bg-rose-100 text-rose-500'} flex items-center justify-center font-mono text-xs font-bold shrink-0">
+                            ${reminder.time}
+                        </div>
+                        <div class="flex flex-col overflow-hidden">
+                            <span class="text-xs font-medium text-slate-700 truncate ${reminder.completed ? 'line-through opacity-60' : ''}" title="${reminder.text}">${reminder.text}</span>
+                            ${isPast && !reminder.completed ? '<span class="text-[9px] text-amber-500 font-bold uppercase">Quá hạn</span>' : ''}
+                            ${reminder.noteId ? '<span class="text-[9px] text-sky-500 font-medium flex items-center gap-1"><i class="fa-solid fa-link text-[8px]"></i> Từ ghi chú</span>' : ''}
+                        </div>
+                    </div>
+                    <button class="btn-delete-reminder text-slate-300 hover:text-rose-500 p-1 rounded transition-colors opacity-0 group-hover:opacity-100 shrink-0" data-id="${reminder.id}">
+                        <i class="fa-solid fa-trash text-[10px]"></i>
+                    </button>
+                `;
+                els.activeRemindersList.appendChild(item);
+            });
+
+            document.querySelectorAll('.btn-delete-reminder').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    reminders = reminders.filter(r => r.id !== id);
+                    saveReminders();
+                    renderReminders();
+                });
+            });
+        }
+
+        function saveReminders() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+        }
+
+        if (els.btnSetReminder) {
+            els.btnSetReminder.addEventListener('click', () => {
+                // Xin quyền thông báo khi người dùng đặt nhắc nhở
+                requestNotificationPermission();
+
+                const text = els.reminderText ? els.reminderText.value.trim() : '';
+                const time = els.reminderTime ? els.reminderTime.value : '';
+                
+                if (!text || !time) return showToast('Lỗi', 'Vui lòng nhập đủ nội dung và giờ.', 'error');
+                
+                reminders.push({
+                    id: Date.now().toString(),
+                    text,
+                    time,
+                    completed: false,
+                    notified: false
+                });
+                
+                saveReminders();
+                renderReminders();
+                
+                if (els.reminderText) els.reminderText.value = '';
+                if (els.reminderTime) els.reminderTime.value = '';
+                showToast('Thành công', 'Đã thêm nhắc nhở mới.', 'success');
+            });
+        }
+
+        function checkReminders(nowDate) {
+            const currentHour = String(nowDate.getHours()).padStart(2, '0');
+            const currentMinute = String(nowDate.getMinutes()).padStart(2, '0');
+            const currentStr = `${currentHour}:${currentMinute}`;
+
+            let needsRender = false;
+
+            reminders.forEach(reminder => {
+                if (reminder.time === currentStr && !reminder.notified && !reminder.completed) {
+                    reminder.notified = true;
+                    reminder.completed = true;
+                    needsRender = true;
+                    
+                    playCustomSound(settings.soundType, settings.volume);
+                    
+                    // Gửi thông báo ra ngoài Desktop
+                    sendDesktopNotification(`Đến giờ: ${reminder.time}`, reminder.text);
+                    
+                    // Thông báo trong DOM (giữ nguyên fallback)
+                    const notif = document.createElement('div');
+                    notif.className = 'fixed top-4 left-4 right-4 sm:left-auto sm:right-4 bg-white border-l-4 border-rose-400 shadow-xl rounded-lg p-4 sm:max-w-sm z-[100] transition-all duration-300';
+                    notif.innerHTML = `
+                        <div class="flex items-start gap-3 relative">
+                            <div class="text-rose-400 text-xl shrink-0"><i class="fa-solid fa-bell"></i></div>
+                            <div class="pr-6">
+                                <h4 class="font-bold text-slate-800 text-sm">Đến giờ: ${reminder.time}</h4>
+                                <p class="text-slate-600 text-xs mt-1">${reminder.text}</p>
+                            </div>
+                            <button class="absolute top-0 right-0 text-slate-400 hover:text-slate-600 text-xs p-1" onclick="this.closest('.fixed').remove()">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    `;
+                    document.body.appendChild(notif);
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(notif)) {
+                            notif.style.opacity = '0';
+                            setTimeout(() => {
+                                if (document.body.contains(notif)) document.body.removeChild(notif);
+                            }, 300);
+                        }
+                    }, 8000);
+                }
+            });
+
+            if (needsRender) {
+                saveReminders();
+                renderReminders();
+            }
+        }
+        
+        renderReminders();
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + 
+                   date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute:'2-digit' });
+        }
+
+        function getPreviewContent(content) {
+            const stripped = (content || '').replace(/(<([^>]+)>)/gi, "");
+            return stripped.length > 40 ? stripped.substring(0, 40) + '...' : stripped || 'Chưa có nội dung...';
+        }
+
+        function renderNotesList(filterText = '') {
+            if (!els.notesList) return;
+            els.notesList.innerHTML = '';
+            const filteredNotes = notes.filter(n => 
+                (n.title || '').toLowerCase().includes(filterText.toLowerCase()) || 
+                (n.content || '').toLowerCase().includes(filterText.toLowerCase())
+            ).sort((a, b) => b.updatedAt - a.updatedAt);
+
+            if (filteredNotes.length === 0) {
+                if (els.emptyState) {
+                    els.emptyState.classList.remove('hidden');
+                    if (filterText) els.emptyState.innerHTML = 'Không tìm thấy kết quả.';
+                    else els.emptyState.innerHTML = 'Chưa có ghi chú nào.<br>Bấm "Tạo ghi chú mới" để bắt đầu!';
+                    els.notesList.appendChild(els.emptyState);
+                }
+                return;
+            }
+
+            if (els.emptyState) els.emptyState.classList.add('hidden');
+
+            filteredNotes.forEach(note => {
+                const item = document.createElement('div');
+                item.className = `p-3 mb-2 rounded-xl border transition-all cursor-pointer ${note.id === currentNoteId ? 'bg-sky-50 border-sky-200 shadow-sm' : 'bg-white border-transparent hover:bg-slate-50 hover:border-slate-200'}`;
+                item.innerHTML = `
+                    <h3 class="font-bold text-xs text-slate-800 truncate mb-1">${note.title || 'Không có tiêu đề'}</h3>
+                    <p class="text-[11px] text-slate-500 truncate mb-2">${getPreviewContent(note.content)}</p>
+                    <div class="text-[10px] text-slate-400">${formatDate(note.updatedAt)}</div>
+                `;
+                item.addEventListener('click', () => loadNote(note.id));
+                els.notesList.appendChild(item);
+            });
+        }
+
+        function saveNote() {
+            if (!currentNoteId) return;
+            
+            const title = els.titleInput ? els.titleInput.value.trim() : '';
+            const content = els.contentInput ? els.contentInput.value : '';
+            
+            const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+            if (noteIndex !== -1) {
+                notes[noteIndex].title = title;
+                notes[noteIndex].content = content;
+                notes[noteIndex].updatedAt = Date.now();
+            } else {
+                notes.push({
+                    id: currentNoteId,
+                    title,
+                    content,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                });
+            }
+            
+            localStorage.setItem('local_notes', JSON.stringify(notes));
+            renderNotesList(els.searchNote ? els.searchNote.value : '');
+            if (els.lastEdited) els.lastEdited.textContent = formatDate(Date.now());
+            
+            extractTimeReminders(currentNoteId, content);
+        }
+
+        function loadNote(id) {
+            currentNoteId = id;
+            const note = notes.find(n => n.id === id);
+            
+            if (note) {
+                if (els.titleInput) els.titleInput.value = note.title || '';
+                if (els.contentInput) els.contentInput.value = note.content || '';
+                if (els.lastEdited) els.lastEdited.textContent = formatDate(note.updatedAt);
+                
+                if (els.noNoteSelected) els.noNoteSelected.classList.add('hidden');
+                if (els.editorContainer) els.editorContainer.classList.remove('hidden');
+            }
+            renderNotesList(els.searchNote ? els.searchNote.value : '');
+        }
+
+        function createNewNote() {
+            currentNoteId = Date.now().toString();
+            if (els.titleInput) els.titleInput.value = '';
+            if (els.contentInput) els.contentInput.value = '';
+            if (els.lastEdited) els.lastEdited.textContent = 'Chưa lưu';
+            
+            if (els.noNoteSelected) els.noNoteSelected.classList.add('hidden');
+            if (els.editorContainer) els.editorContainer.classList.remove('hidden');
+            
+            if (els.titleInput) els.titleInput.focus();
+            
+            notes.push({
+                id: currentNoteId,
+                title: '',
+                content: '',
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            });
+            renderNotesList();
+        }
+
+        function deleteCurrentNote() {
+            if (!currentNoteId) return;
+            if (els.confirmModal) els.confirmModal.classList.remove('hidden');
+        }
+
+        if (els.btnCancelDelete) {
+            els.btnCancelDelete.addEventListener('click', () => {
+                if (els.confirmModal) els.confirmModal.classList.add('hidden');
+            });
+        }
+
+        if (els.btnConfirmDelete) {
+            els.btnConfirmDelete.addEventListener('click', () => {
+                if (els.confirmModal) els.confirmModal.classList.add('hidden');
+                
+                reminders = reminders.filter(r => r.noteId !== currentNoteId);
+                saveReminders();
+                renderReminders();
+
+                notes = notes.filter(n => n.id !== currentNoteId);
+                localStorage.setItem('local_notes', JSON.stringify(notes));
+                
+                currentNoteId = null;
+                if (els.editorContainer) els.editorContainer.classList.add('hidden');
+                if (els.noNoteSelected) els.noNoteSelected.classList.remove('hidden');
+                renderNotesList(els.searchNote ? els.searchNote.value : '');
+                
+                if (isPipActive && document.pictureInPictureElement) {
+                    document.exitPictureInPicture().catch(() => {});
+                }
+            });
+        }
+
+        if (els.btnNewNote) els.btnNewNote.addEventListener('click', createNewNote);
+        if (els.btnSaveNote) els.btnSaveNote.addEventListener('click', saveNote);
+        if (els.btnDeleteNote) els.btnDeleteNote.addEventListener('click', deleteCurrentNote);
+        if (els.searchNote) {
+            els.searchNote.addEventListener('input', (e) => {
+                renderNotesList(e.target.value);
+            });
+        }
+
+        function extractTimeReminders(noteId, text) {
+            if (!noteId) return;
+
+            const initialCount = reminders.length;
+            reminders = reminders.filter(r => r.noteId !== noteId);
+
+            if (!text || !text.trim()) {
+                if (reminders.length !== initialCount) {
+                    saveReminders();
+                    renderReminders();
+                }
+                return;
+            }
+
+            const timeRegex = /(sáng|trưa|chiều|tối|đêm)?\s*\b([0-1]?[0-9]|2[0-3])\s*(h|g|:)\s*([0-5][0-9])?\s*(sáng|trưa|chiều|tối|đêm|am|pm|a\.m\.|p\.m\.)?\b/gi;
+            let match;
+            const addedTimes = new Set();
+
+            while ((match = timeRegex.exec(text)) !== null) {
+                let hourNum = parseInt(match[2], 10);
+                const modifier = (match[1] || match[5] || '').toLowerCase();
+
+                const isPm = /chiều|tối|đêm|pm/.test(modifier);
+                const isAm = /sáng|am/.test(modifier);
+                const isTrua = /trưa/.test(modifier);
+
+                if (isPm) {
+                    if (hourNum < 12) hourNum += 12;
+                    else if (hourNum === 12 && /tối|đêm/.test(modifier)) hourNum = 0;
+                } else if (isAm) {
+                    if (hourNum === 12) hourNum = 0;
+                } else if (isTrua) {
+                    if (hourNum < 12 && hourNum !== 12) hourNum += 12;
+                }
+
+                const hourStr = String(hourNum).padStart(2, '0');
+                const minStr = match[4] ? String(match[4]).padStart(2, '0') : '00';
+                const timeStr = `${hourStr}:${minStr}`;
+
+                if (addedTimes.has(timeStr)) continue;
+                addedTimes.add(timeStr);
+
+                const matchIndex = match.index;
+                const matchLen = match[0].length;
+
+                const lineStart = text.lastIndexOf('\n', matchIndex) + 1;
+                let lineEnd = text.indexOf('\n', matchIndex + matchLen);
+                if (lineEnd === -1) lineEnd = text.length;
+
+                let lineSnippet = text.substring(lineStart, lineEnd).trim();
+                
+                let cleanedSnippet = lineSnippet
+                    .replace(/^[-*•]\s*/, '')
+                    .replace(/^\d+[\.\)]\s*/, '')
+                    .replace(/^\[[\sx]\]\s*/i, '');
+
+                let contextText = cleanedSnippet.replace(match[0], '').replace(/\s+/g, ' ').trim();
+                contextText = contextText.replace(/^[-*•:]\s*/, '').replace(/^(lúc|vào)\s+/i, '').trim();
+
+                if (!contextText) contextText = "Nhắc nhở từ ghi chú";
+
+                // Chỉ tạo nhắc nhở mới, tự động hệ thống sẽ xin quyền khi nó chạy đến hàm checkReminders
+                reminders.push({
+                    id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 4),
+                    noteId: noteId,
+                    text: contextText.length > 35 ? contextText.substring(0, 35) + '...' : contextText,
+                    time: timeStr,
+                    completed: false,
+                    notified: false,
+                    autoGenerated: true
+                });
+            }
+
+            saveReminders();
+            renderReminders();
+        }
+
+        if (els.btnAiImprove) {
+            els.btnAiImprove.addEventListener('click', () => {
+                if (!els.contentInput || !els.contentInput.value.trim()) {
+                    return showToast('AI Assistant', 'Hãy nhập nội dung ghi chú trước!', 'info');
+                }
+                const original = els.contentInput.value;
+                els.contentInput.value = original.trim() + "\n\n✨ [AI Làm mượt]: Văn bản đã được chỉnh sửa chỉn chu và diễn đạt rõ ràng hơn.";
+                saveNote();
+                showToast('AI Assistant', 'Đã làm mượt văn bản ghi chú.', 'success');
+            });
+        }
+
+        if (els.btnAiSummarize) {
+            els.btnAiSummarize.addEventListener('click', () => {
+                if (!els.contentInput || !els.contentInput.value.trim()) {
+                    return showToast('AI Assistant', 'Hãy nhập nội dung ghi chú trước!', 'info');
+                }
+                const original = els.contentInput.value;
+                const lines = original.split('\n').filter(l => l.trim().length > 0);
+                const summary = lines.slice(0, 3).map(l => `• ${l}`).join('\n');
+                els.contentInput.value = original + "\n\n📌 [AI Tóm tắt]:\n" + summary;
+                saveNote();
+                showToast('AI Assistant', 'Đã tạo bản tóm tắt nội dung.', 'success');
+            });
+        }
+
+        if (els.btnAiTodos) {
+            els.btnAiTodos.addEventListener('click', () => {
+                if (!els.contentInput) return;
+                const sampleTodos = "\n\n📋 [Danh sách việc cần làm]:\n- 08h00 Đọc tài liệu Điều dưỡng\n- 12h30 Uống nước & nghỉ ngơi\n- 17h00 Ôn bài cũ";
+                els.contentInput.value += sampleTodos;
+                saveNote();
+                showToast('AI Assistant', 'Đã thêm danh sách To-do mẫu!', 'success');
+            });
+        }
+
+        function openGuideModal() {
+            if (els.guideModal) els.guideModal.classList.remove('hidden');
+        }
+
+        function closeGuideModal() {
+            if (els.guideModal) els.guideModal.classList.add('hidden');
+        }
+
+        if (els.btnOpenGuide) els.btnOpenGuide.addEventListener('click', openGuideModal);
+        if (els.btnOpenGuideLink) els.btnOpenGuideLink.addEventListener('click', openGuideModal);
+        if (els.btnCloseGuide) els.btnCloseGuide.addEventListener('click', closeGuideModal);
+        if (els.btnCloseGuideDone) els.btnCloseGuideDone.addEventListener('click', closeGuideModal);
+
+        if (els.guideModal) {
+            els.guideModal.addEventListener('click', (e) => {
+                if (e.target === els.guideModal) closeGuideModal();
+            });
+        }
+
+        renderNotesList();
+        if (notes.length > 0) {
+            loadNote(notes[0].id);
+        }
+
+        if (els.btnOpenSettings) {
+            els.btnOpenSettings.addEventListener('click', () => {
+                if (els.settingSoundType) els.settingSoundType.value = settings.soundType;
+                if (els.settingVolume) els.settingVolume.value = settings.volume;
+                if (els.settingVolumeLabel) els.settingVolumeLabel.textContent = `${settings.volume}%`;
+                if (els.settingVitalToggle) els.settingVitalToggle.checked = settings.vitalEnabled;
+                if (els.settingVitalInterval) els.settingVitalInterval.value = settings.vitalIntervalMinutes;
+
+                if (els.settingsModal) els.settingsModal.classList.remove('hidden');
+            });
+        }
+
+        if (els.btnCloseSettings) {
+            els.btnCloseSettings.addEventListener('click', () => {
+                if (els.settingsModal) els.settingsModal.classList.add('hidden');
+            });
+        }
+
+        if (els.settingsModal) {
+            els.settingsModal.addEventListener('click', (e) => {
+                if (e.target === els.settingsModal) els.settingsModal.classList.add('hidden');
+            });
+        }
+
+        if (els.settingVolume) {
+            els.settingVolume.addEventListener('input', (e) => {
+                if (els.settingVolumeLabel) els.settingVolumeLabel.textContent = `${e.target.value}%`;
+            });
+        }
+
+        if (els.btnTestSound) {
+            els.btnTestSound.addEventListener('click', () => {
+                const sound = els.settingSoundType ? els.settingSoundType.value : settings.soundType;
+                const vol = els.settingVolume ? parseInt(els.settingVolume.value) : settings.volume;
+                playCustomSound(sound, vol);
+            });
+        }
+
+        if (els.btnSaveSettings) {
+            els.btnSaveSettings.addEventListener('click', () => {
+                // Xin quyền nếu người dùng bật sinh tồn
+                if(els.settingVitalToggle && els.settingVitalToggle.checked) {
+                    requestNotificationPermission();
+                }
+
+                settings = {
+                    soundType: els.settingSoundType ? els.settingSoundType.value : 'chime',
+                    volume: els.settingVolume ? parseInt(els.settingVolume.value) : 70,
+                    vitalEnabled: els.settingVitalToggle ? els.settingVitalToggle.checked : true,
+                    vitalIntervalMinutes: els.settingVitalInterval ? parseInt(els.settingVitalInterval.value) : 45
+                };
+                
+                localStorage.setItem('user_settings', JSON.stringify(settings));
+                applyVitalSettings();
+                
+                if (els.settingsModal) els.settingsModal.classList.add('hidden');
+                showToast('Thành công', 'Đã lưu cài đặt hệ thống.', 'success');
+            });
+        }
+
+        const vitalTips = [
+            { icon: '💧', title: 'Đã đến lúc uống nước!', msg: 'Một ngụm nước ấm sẽ giúp bạn tỉnh táo và bảo vệ thanh quản.' },
+            { icon: '👀', title: 'Quy tắc 20-20-20', msg: 'Rời mắt khỏi màn hình, nhìn xa 6m (20ft) trong 20 giây để giảm mỏi mắt nhé.' },
+            { icon: '🧘', title: 'Kéo căng cơ thể', msg: 'Vươn vai, vặn mình sang hai bên để giãn cột sống và giải phóng căng thẳng cơ bắp.' },
+            { icon: '🫁', title: 'Hít thở sâu', msg: 'Dành 1 phút hít thở chậm: Hít vào 4s, giữ 4s, thở ra 4s. Giúp não bộ nạp oxy.' },
+            { icon: '🚶', title: 'Đứng lên đi lại', msg: 'Ngồi quá lâu không tốt cho tuần hoàn máu. Đứng lên đi bộ vài bước quanh phòng nhé.' }
+        ];
+
+        function applyVitalSettings() {
+            if (els.vitalBadge) {
+                if (settings.vitalEnabled) {
+                    els.vitalBadge.innerHTML = `<i class="fa-solid fa-heart-pulse text-emerald-500"></i> Sinh tồn: ${settings.vitalIntervalMinutes}p`;
+                    els.vitalBadge.className = "text-[9px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium flex items-center gap-1";
+                } else {
+                    els.vitalBadge.innerHTML = `<i class="fa-solid fa-bell-slash text-slate-400"></i> Sinh tồn: Tắt`;
+                    els.vitalBadge.className = "text-[9px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium flex items-center gap-1";
+                }
+            }
+
+            if (vitalTimerInterval) clearInterval(vitalTimerInterval);
+            
+            if (settings.vitalEnabled) {
+                const intervalMs = settings.vitalIntervalMinutes * 60 * 1000;
+                lastVitalTime = Date.now();
+                vitalTimerInterval = setInterval(() => checkVitalAlert(intervalMs), 10000);
+            }
+        }
+
+        function checkVitalAlert(intervalMs) {
+            const now = Date.now();
+            if (now - lastVitalTime >= intervalMs) {
+                showVitalAlertModal();
+                lastVitalTime = now;
+            }
+        }
+
+        function showVitalAlertModal() {
+            const tip = vitalTips[Math.floor(Math.random() * vitalTips.length)];
+            
+            if (els.vitalAlertIcon) els.vitalAlertIcon.textContent = tip.icon;
+            if (els.vitalAlertTitle) els.vitalAlertTitle.textContent = tip.title;
+            if (els.vitalAlertMsg) els.vitalAlertMsg.textContent = tip.msg;
+            if (els.vitalAlertTag) els.vitalAlertTag.textContent = `Nhắc sau ${settings.vitalIntervalMinutes}p`;
+
+            playCustomSound('chime', settings.volume * 0.5);
+
+            // Gửi thông báo ra ngoài Desktop
+            sendDesktopNotification(tip.icon + " " + tip.title, tip.msg);
+
+            if (els.vitalAlertModal) {
+                els.vitalAlertModal.classList.remove('hidden');
+                setTimeout(() => {
+                    els.vitalAlertModal.classList.remove('opacity-0', 'translate-y-4');
+                }, 10);
+            }
+        }
+
+        function hideVitalAlertModal() {
+            if (els.vitalAlertModal) {
+                els.vitalAlertModal.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => {
+                    els.vitalAlertModal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        if (els.btnTriggerTestVital) {
+            els.btnTriggerTestVital.addEventListener('click', () => {
+                requestNotificationPermission(); // Xin quyền nếu bấm test
+                showVitalAlertModal();
+            });
+        }
+
+        if (els.btnCloseVitalModal) els.btnCloseVitalModal.addEventListener('click', hideVitalAlertModal);
+        if (els.btnVitalAck) els.btnVitalAck.addEventListener('click', hideVitalAlertModal);
+        
+        if (els.btnVitalSnooze) {
+            els.btnVitalSnooze.addEventListener('click', () => {
+                hideVitalAlertModal();
+                const intervalMs = settings.vitalIntervalMinutes * 60 * 1000;
+                const snoozeMs = 10 * 60 * 1000;
+                lastVitalTime = Date.now() - intervalMs + snoozeMs; 
+                showToast('Snooze', 'Sẽ nhắc lại sau 10 phút', 'info');
+            });
+        }
+
+        applyVitalSettings();
+
+        const tarotCards = [
+            { icon: '🌟', title: 'Ngôi Sao Hy Vọng', elem: 'Khí', num: '#01', sub: 'Tích cực & Sáng tạo',
+              msg: 'Mọi nỗ lực nhỏ mỗi ngày đều đang âm thầm tích lũy thành thành công lớn. Hãy mỉm cười và tự tin bước tiếp!',
+              tip: 'Dành 15 phút hôm nay để làm một việc bạn thực sự yêu thích để nuôi dưỡng tâm hồn.' },
+            { icon: '🌱', title: 'Mầm Xanh Kiên Nhẫn', elem: 'Đất', num: '#04', sub: 'Bền bỉ & Nuôi dưỡng',
+              msg: 'Đừng vội vàng. Những điều tuyệt vời nhất cần thời gian để phát triển. Sự kiên nhẫn của bạn sẽ được đền đáp.',
+              tip: 'Bổ sung thêm rau xanh vào bữa ăn hôm nay và uống đủ 2 lít nước.' },
+            { icon: '🔥', title: 'Ngọn Lửa Đam Mê', elem: 'Lửa', num: '#07', sub: 'Nhiệt huyết & Hành động',
+              msg: 'Năng lượng đang tràn đầy. Đây là lúc lý tưởng để bắt tay vào thực hiện mục tiêu mà bạn đang chần chừ.',
+              tip: 'Vận động nhẹ nhàng 20 phút để kích thích tuần hoàn máu, giúp não bộ nhạy bén hơn.' },
+            { icon: '💧', title: 'Giọt Nước Chữa Lành', elem: 'Nước', num: '#12', sub: 'Cảm xúc & Thanh lọc',
+              msg: 'Hãy cho phép bản thân nghỉ ngơi nếu thấy mệt. Đôi khi lùi lại một bước là để tiến xa hơn ba bước.',
+              tip: 'Tắm nước ấm tối nay và nghe một bản nhạc thiền để thanh lọc tâm trí trước khi ngủ.' },
+            { icon: '☀️', title: 'Ánh Dương Rực Rỡ', elem: 'Lửa', num: '#19', sub: 'Thành công & Lan tỏa',
+              msg: 'Bạn mang trong mình ánh sáng ấm áp. Hãy lan tỏa sự tích cực ấy đến những người xung quanh ngày hôm nay.',
+              tip: 'Phơi nắng sáng sớm (trước 8h) khoảng 10 phút để tổng hợp Vitamin D, tăng cường miễn dịch.' }
+        ];
+
+        let hasDrawnCardToday = false;
+
+        if (els.btnOpenDailyEnergy) {
+            els.btnOpenDailyEnergy.addEventListener('click', () => {
+                if (els.dailyEnergyModal) els.dailyEnergyModal.classList.remove('hidden');
+                resetCard();
+            });
+        }
+
+        if (els.btnCloseDailyEnergy) {
+            els.btnCloseDailyEnergy.addEventListener('click', () => {
+                if (els.dailyEnergyModal) els.dailyEnergyModal.classList.add('hidden');
+            });
+        }
+
+        if (els.dailyEnergyModal) {
+            els.dailyEnergyModal.addEventListener('click', (e) => {
+                if (e.target === els.dailyEnergyModal) {
+                    els.dailyEnergyModal.classList.add('hidden');
+                }
+            });
+        }
+        
+        if (els.btnCloseEnergyDone) {
+            els.btnCloseEnergyDone.addEventListener('click', () => {
+                if (els.dailyEnergyModal) els.dailyEnergyModal.classList.add('hidden');
+                if (hasDrawnCardToday) showToast('Chúc ngày mới', 'Năng lượng đã được nạp đầy! Bắt đầu thôi! 🔥', 'success');
+            });
+        }
+
+        function resetCard() {
+            if (els.cardInner) els.cardInner.classList.remove('flipped');
+            if (els.cardDetailsBox) els.cardDetailsBox.classList.add('hidden');
+            hasDrawnCardToday = false;
+        }
+
+        if (els.cardFlipper) {
+            els.cardFlipper.addEventListener('click', () => {
+                if (hasDrawnCardToday) return;
+
+                const randomCard = tarotCards[Math.floor(Math.random() * tarotCards.length)];
+                
+                if (els.cardElement) els.cardElement.textContent = `⚛️ Yếu tố: ${randomCard.elem}`;
+                if (els.cardNumber) els.cardNumber.textContent = randomCard.num;
+                if (els.cardIcon) els.cardIcon.textContent = randomCard.icon;
+                if (els.cardTitle) els.cardTitle.textContent = randomCard.title;
+                if (els.cardSubtitle) els.cardSubtitle.textContent = randomCard.sub;
+                
+                if (els.cardMessage) els.cardMessage.textContent = `"${randomCard.msg}"`;
+                if (els.cardHealthTip) els.cardHealthTip.textContent = randomCard.tip;
+
+                if (els.cardInner) els.cardInner.classList.add('flipped');
+                playCustomSound('chime', settings.volume);
+
+                setTimeout(() => {
+                    if (els.cardDetailsBox) els.cardDetailsBox.classList.remove('hidden');
+                    hasDrawnCardToday = true;
+                }, 700);
+            });
+        }
+
+        if (els.btnDrawAgain) {
+            els.btnDrawAgain.addEventListener('click', () => {
+                resetCard();
+            });
+        }
+    </script>
+</body>
+</html>
